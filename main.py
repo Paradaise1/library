@@ -18,10 +18,13 @@ COMMANDS = [
 
 # Все доступные статусы
 STATUSES = {0: 'в наличии', 1: 'выдана'}
+# Название локальной библиотеки
+DATA_FILENAME = 'data.json'
 
 
 class LibraryManager():
     '''Класс для работы с библиотекой.'''
+    FILENAME = DATA_FILENAME
     def print_book(self, book: Dict) -> None:
         '''Вспомогательный метод для вывода конкретной книги.'''
         for key, value in book.items():
@@ -47,7 +50,7 @@ class LibraryManager():
             return
         year = self.validate(year, 'Год выпуска')
         # Читаем файл, создаем и добавлем книгу, перезаписываем файл
-        with open('data.json', 'r+', encoding='utf-8') as f:
+        with open(self.FILENAME, 'r+', encoding='utf-8') as f:
             data = json.load(f)
             if data:
                 current_id = data[-1]['id'] + 1
@@ -72,7 +75,7 @@ class LibraryManager():
         current_id = self.validate(current_id, 'Индентификатор')
         # Открваем файл, ищем книгу, если нашли - возвращаем ее index
         # Иначе - None
-        with open('data.json', 'r', encoding='utf-8') as f:
+        with open(self.FILENAME, 'r', encoding='utf-8') as f:
             data = json.load(f)
             if data:
                 for i, book in enumerate(data):
@@ -90,7 +93,7 @@ class LibraryManager():
         if current_id is None:
             return
         # Открваем файл, удаляем книгу
-        with open('data.json', 'r+', encoding='utf-8') as f:
+        with open(self.FILENAME, 'r+', encoding='utf-8') as f:
             data = json.load(f)
             data.pop(current_id)
             f.seek(0)
@@ -101,7 +104,7 @@ class LibraryManager():
     def show_books(self) -> None:
         '''Метод для вывода информации о всех книгах в библиотеке.'''
         # Открваем файл, читаем информацию, выводим ее
-        with open('data.json', 'r', encoding='utf-8') as f:
+        with open(self.FILENAME, 'r', encoding='utf-8') as f:
             data = json.load(f)
         if data:
             for book in data:
@@ -125,7 +128,7 @@ class LibraryManager():
             print('Неверный статус.')
             return
         # Читаем файл, меняем статус, перезаписываем файл
-        with open('data.json', 'r+', encoding='utf-8') as f:
+        with open(self.FILENAME, 'r+', encoding='utf-8') as f:
             data = json.load(f)
             data[current_id]['status'] = new_status
             f.seek(0)
@@ -152,8 +155,8 @@ class CommandsManager():
 def main() -> None:
     '''Основная логика программы.'''
     # Инициализируем все необходимое для работы программы
-    if not os.path.exists('data.json'):
-        with open('data.json', 'w') as f:
+    if not os.path.exists(DATA_FILENAME):
+        with open(DATA_FILENAME, 'w') as f:
             json.dump([], f)
 
     lm = LibraryManager()

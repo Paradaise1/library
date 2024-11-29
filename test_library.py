@@ -2,11 +2,14 @@ import json
 
 from main import LibraryManager
 
+from conftest import TEST_DATA_FILENAME
+
 
 class TestLibraryManager():
     '''Класс для тестирования функционала класса LibraryManager.'''
     # Создаем эксземпляер тестируемого класса
     lm = LibraryManager()
+    lm.FILENAME = TEST_DATA_FILENAME
 
     def test_add_book(self, monkeypatch, create_statuses):
         '''Тест создания книги.'''
@@ -15,7 +18,7 @@ class TestLibraryManager():
             'builtins.input', lambda _: 'test_title test_author 2000'
         )
         self.lm.add_book()
-        with open('data.json', 'r', encoding='utf-8') as f:
+        with open(TEST_DATA_FILENAME, 'r', encoding='utf-8') as f:
             data = json.load(f)
         assert len(data) == 1
         assert data[0]['id'] == 1
@@ -35,7 +38,7 @@ class TestLibraryManager():
         inputs = iter(['1', 'invalid_status'])
         monkeypatch.setattr('builtins.input', lambda _: next(inputs))
         self.lm.change_status()
-        with open('data.json', 'r', encoding='utf-8') as f:
+        with open(TEST_DATA_FILENAME, 'r', encoding='utf-8') as f:
             data = json.load(f)
         assert data[0]['status'] == 'в наличии'
 
@@ -44,7 +47,7 @@ class TestLibraryManager():
         inputs = iter(['1', 'выдана'])
         monkeypatch.setattr('builtins.input', lambda _: next(inputs))
         self.lm.change_status()
-        with open('data.json', 'r', encoding='utf-8') as f:
+        with open(TEST_DATA_FILENAME, 'r', encoding='utf-8') as f:
             data = json.load(f)
         assert data[0]['status'] == 'выдана'
 
@@ -52,7 +55,7 @@ class TestLibraryManager():
         '''Тест удаления несуществующей книги.'''
         monkeypatch.setattr('builtins.input', lambda _: '100')
         self.lm.delete_book()
-        with open('data.json', 'r', encoding='utf-8') as f:
+        with open(TEST_DATA_FILENAME, 'r', encoding='utf-8') as f:
             data = json.load(f)
         assert len(data) == 1
 
@@ -60,7 +63,7 @@ class TestLibraryManager():
         '''Тест удаления существующей книги.'''
         monkeypatch.setattr('builtins.input', lambda _: '1')
         self.lm.delete_book()
-        with open('data.json', 'r', encoding='utf-8') as f:
+        with open(TEST_DATA_FILENAME, 'r', encoding='utf-8') as f:
             data = json.load(f)
         assert len(data) == 0
 
@@ -69,6 +72,6 @@ class TestLibraryManager():
         monkeypatch.setattr(
             'builtins.input', lambda _: 'test_title test_author string'
         )
-        with open('data.json', 'r', encoding='utf-8') as f:
+        with open(TEST_DATA_FILENAME, 'r', encoding='utf-8') as f:
             data = json.load(f)
         assert len(data) == 0
